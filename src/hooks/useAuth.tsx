@@ -73,11 +73,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logActivity = async (action: string, details?: Record<string, unknown>) => {
     if (!user) return;
-    await supabase.from("activity_log").insert({
-      user_id: user.id,
-      action,
-      details: details ?? null,
-    });
+    await supabase.from("activity_log").insert([
+      {
+        user_id: user.id,
+        action,
+        details: (details ?? null) as never,
+      },
+    ]);
   };
 
   return (
