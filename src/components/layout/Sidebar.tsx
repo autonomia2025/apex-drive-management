@@ -10,6 +10,7 @@ import {
   X,
   Sparkles,
   Lock,
+  Contact,
 } from "lucide-react";
 import { Logo } from "@/components/shared/Logo";
 import { useAuth } from "@/hooks/useAuth";
@@ -25,7 +26,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface NavItem {
-  to: "/dashboard" | "/profile" | "/users" | "/activity-log";
+  to: "/dashboard" | "/profile" | "/users" | "/activity-log" | "/crm";
   label: string;
   icon: typeof LayoutDashboard;
   resource: Resource;
@@ -33,13 +34,18 @@ interface NavItem {
 
 const ITEMS: NavItem[] = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, resource: "dashboard" },
+  { to: "/crm", label: "CRM", icon: Contact, resource: "crm" },
   { to: "/users", label: "Usuarios", icon: Users, resource: "users" },
-  { to: "/activity-log", label: "Registro de actividad", icon: ScrollText, resource: "activity_log" },
+  {
+    to: "/activity-log",
+    label: "Registro de actividad",
+    icon: ScrollText,
+    resource: "activity_log",
+  },
 ];
 
 const FUTURE = [
   { label: "Inventario", icon: Lock },
-  { label: "CRM", icon: Lock },
   { label: "Ventas", icon: Lock },
   { label: "Reportes", icon: Lock },
   { label: "Asistente IA", icon: Sparkles },
@@ -51,12 +57,13 @@ export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void 
 
   const visible = ITEMS.filter((i) => canAccess(role, i.resource));
 
-  const initials = profile?.full_name
-    ?.split(" ")
-    .map((n) => n[0])
-    .slice(0, 2)
-    .join("")
-    .toUpperCase() ?? "?";
+  const initials =
+    profile?.full_name
+      ?.split(" ")
+      .map((n) => n[0])
+      .slice(0, 2)
+      .join("")
+      .toUpperCase() ?? "?";
 
   return (
     <>
@@ -77,7 +84,10 @@ export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void 
         {/* Logo */}
         <div className="flex h-16 items-center justify-between border-b border-sidebar-border px-4">
           <Logo />
-          <button onClick={onClose} className="rounded-md p-1 text-muted-foreground hover:bg-accent lg:hidden">
+          <button
+            onClick={onClose}
+            className="rounded-md p-1 text-muted-foreground hover:bg-accent lg:hidden"
+          >
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -86,7 +96,8 @@ export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void 
         <nav className="flex-1 overflow-y-auto p-3">
           <div className="space-y-1">
             {visible.map((item) => {
-              const active = location.pathname === item.to || location.pathname.startsWith(item.to + "/");
+              const active =
+                location.pathname === item.to || location.pathname.startsWith(item.to + "/");
               const Icon = item.icon;
               return (
                 <Link
@@ -139,7 +150,9 @@ export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void 
                   </AvatarFallback>
                 </Avatar>
                 <div className="min-w-0 flex-1">
-                  <div className="truncate text-sm font-medium text-foreground">{profile?.full_name ?? "Usuario"}</div>
+                  <div className="truncate text-sm font-medium text-foreground">
+                    {profile?.full_name ?? "Usuario"}
+                  </div>
                   <div className="truncate text-xs text-muted-foreground">{profile?.email}</div>
                 </div>
               </button>
@@ -152,7 +165,10 @@ export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void 
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => signOut()} className="cursor-pointer text-destructive focus:text-destructive">
+              <DropdownMenuItem
+                onClick={() => signOut()}
+                className="cursor-pointer text-destructive focus:text-destructive"
+              >
                 <LogOut className="mr-2 h-4 w-4" />
                 Cerrar sesión
               </DropdownMenuItem>
@@ -166,7 +182,10 @@ export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void 
 
 export function MobileMenuButton({ onClick }: { onClick: () => void }) {
   return (
-    <button onClick={onClick} className="rounded-md p-2 text-muted-foreground hover:bg-accent lg:hidden">
+    <button
+      onClick={onClick}
+      className="rounded-md p-2 text-muted-foreground hover:bg-accent lg:hidden"
+    >
       <Menu className="h-5 w-5" />
     </button>
   );

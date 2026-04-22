@@ -19,6 +19,9 @@ import { Route as AppUsersRouteImport } from './routes/_app/users'
 import { Route as AppProfileRouteImport } from './routes/_app/profile'
 import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
 import { Route as AppActivityLogRouteImport } from './routes/_app/activity-log'
+import { Route as AppCrmRouteRouteImport } from './routes/_app/crm/route'
+import { Route as AppCrmIndexRouteImport } from './routes/_app/crm/index'
+import { Route as AppCrmCustomerIdRouteImport } from './routes/_app/crm/$customerId'
 
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
@@ -69,6 +72,21 @@ const AppActivityLogRoute = AppActivityLogRouteImport.update({
   path: '/activity-log',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppCrmRouteRoute = AppCrmRouteRouteImport.update({
+  id: '/crm',
+  path: '/crm',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppCrmIndexRoute = AppCrmIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppCrmRouteRoute,
+} as any)
+const AppCrmCustomerIdRoute = AppCrmCustomerIdRouteImport.update({
+  id: '/$customerId',
+  path: '/$customerId',
+  getParentRoute: () => AppCrmRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -76,10 +94,13 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/crm': typeof AppCrmRouteRouteWithChildren
   '/activity-log': typeof AppActivityLogRoute
   '/dashboard': typeof AppDashboardRoute
   '/profile': typeof AppProfileRoute
   '/users': typeof AppUsersRoute
+  '/crm/$customerId': typeof AppCrmCustomerIdRoute
+  '/crm/': typeof AppCrmIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -91,6 +112,8 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AppDashboardRoute
   '/profile': typeof AppProfileRoute
   '/users': typeof AppUsersRoute
+  '/crm/$customerId': typeof AppCrmCustomerIdRoute
+  '/crm': typeof AppCrmIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -100,10 +123,13 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/_app/crm': typeof AppCrmRouteRouteWithChildren
   '/_app/activity-log': typeof AppActivityLogRoute
   '/_app/dashboard': typeof AppDashboardRoute
   '/_app/profile': typeof AppProfileRoute
   '/_app/users': typeof AppUsersRoute
+  '/_app/crm/$customerId': typeof AppCrmCustomerIdRoute
+  '/_app/crm/': typeof AppCrmIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -113,10 +139,13 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/reset-password'
+    | '/crm'
     | '/activity-log'
     | '/dashboard'
     | '/profile'
     | '/users'
+    | '/crm/$customerId'
+    | '/crm/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -128,6 +157,8 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/profile'
     | '/users'
+    | '/crm/$customerId'
+    | '/crm'
   id:
     | '__root__'
     | '/'
@@ -136,10 +167,13 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/reset-password'
+    | '/_app/crm'
     | '/_app/activity-log'
     | '/_app/dashboard'
     | '/_app/profile'
     | '/_app/users'
+    | '/_app/crm/$customerId'
+    | '/_app/crm/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -223,10 +257,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppActivityLogRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/_app/crm': {
+      id: '/_app/crm'
+      path: '/crm'
+      fullPath: '/crm'
+      preLoaderRoute: typeof AppCrmRouteRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/crm/': {
+      id: '/_app/crm/'
+      path: '/'
+      fullPath: '/crm/'
+      preLoaderRoute: typeof AppCrmIndexRouteImport
+      parentRoute: typeof AppCrmRouteRoute
+    }
+    '/_app/crm/$customerId': {
+      id: '/_app/crm/$customerId'
+      path: '/$customerId'
+      fullPath: '/crm/$customerId'
+      preLoaderRoute: typeof AppCrmCustomerIdRouteImport
+      parentRoute: typeof AppCrmRouteRoute
+    }
   }
 }
 
+interface AppCrmRouteRouteChildren {
+  AppCrmCustomerIdRoute: typeof AppCrmCustomerIdRoute
+  AppCrmIndexRoute: typeof AppCrmIndexRoute
+}
+
+const AppCrmRouteRouteChildren: AppCrmRouteRouteChildren = {
+  AppCrmCustomerIdRoute: AppCrmCustomerIdRoute,
+  AppCrmIndexRoute: AppCrmIndexRoute,
+}
+
+const AppCrmRouteRouteWithChildren = AppCrmRouteRoute._addFileChildren(
+  AppCrmRouteRouteChildren,
+)
+
 interface AppRouteRouteChildren {
+  AppCrmRouteRoute: typeof AppCrmRouteRouteWithChildren
   AppActivityLogRoute: typeof AppActivityLogRoute
   AppDashboardRoute: typeof AppDashboardRoute
   AppProfileRoute: typeof AppProfileRoute
@@ -234,6 +304,7 @@ interface AppRouteRouteChildren {
 }
 
 const AppRouteRouteChildren: AppRouteRouteChildren = {
+  AppCrmRouteRoute: AppCrmRouteRouteWithChildren,
   AppActivityLogRoute: AppActivityLogRoute,
   AppDashboardRoute: AppDashboardRoute,
   AppProfileRoute: AppProfileRoute,
@@ -255,12 +326,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

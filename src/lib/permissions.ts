@@ -15,9 +15,9 @@ const MATRIX: Record<Resource, UserRole[]> = {
   profile: ["admin", "gerente", "vendedor", "almacen"],
   users: ["admin"],
   activity_log: ["admin", "gerente"],
+  crm: ["admin", "gerente", "vendedor"],
   // future phases (placeholder)
   inventory: ["admin", "gerente", "almacen"],
-  crm: ["admin", "gerente", "vendedor"],
   sales: ["admin", "gerente", "vendedor"],
   reports: ["admin", "gerente"],
 };

@@ -49,6 +49,108 @@ export type Database = {
           },
         ]
       }
+      customer_interactions: {
+        Row: {
+          author_id: string | null
+          created_at: string
+          customer_id: string
+          description: string
+          id: string
+          type: Database["public"]["Enums"]["interaction_type"]
+        }
+        Insert: {
+          author_id?: string | null
+          created_at?: string
+          customer_id: string
+          description: string
+          id?: string
+          type: Database["public"]["Enums"]["interaction_type"]
+        }
+        Update: {
+          author_id?: string | null
+          created_at?: string
+          customer_id?: string
+          description?: string
+          id?: string
+          type?: Database["public"]["Enums"]["interaction_type"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_interactions_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_interactions_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      customers: {
+        Row: {
+          assigned_to: string | null
+          created_at: string
+          created_by: string | null
+          email: string | null
+          full_name: string
+          id: string
+          notes: string | null
+          phone: string | null
+          source: Database["public"]["Enums"]["customer_source"]
+          stage: Database["public"]["Enums"]["customer_stage"]
+          type: Database["public"]["Enums"]["customer_type"]
+          updated_at: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          full_name: string
+          id?: string
+          notes?: string | null
+          phone?: string | null
+          source?: Database["public"]["Enums"]["customer_source"]
+          stage?: Database["public"]["Enums"]["customer_stage"]
+          type?: Database["public"]["Enums"]["customer_type"]
+          updated_at?: string
+        }
+        Update: {
+          assigned_to?: string | null
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          full_name?: string
+          id?: string
+          notes?: string | null
+          phone?: string | null
+          source?: Database["public"]["Enums"]["customer_source"]
+          stage?: Database["public"]["Enums"]["customer_stage"]
+          type?: Database["public"]["Enums"]["customer_type"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customers_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customers_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -108,6 +210,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_access_customer: {
+        Args: { _customer_id: string; _user_id: string }
+        Returns: boolean
+      }
       get_user_role: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["user_role"]
@@ -119,8 +225,20 @@ export type Database = {
         }
         Returns: boolean
       }
+      show_limit: { Args: never; Returns: number }
+      show_trgm: { Args: { "": string }; Returns: string[] }
     }
     Enums: {
+      customer_source: "referido" | "web" | "redes" | "showroom" | "otro"
+      customer_stage:
+        | "nuevo"
+        | "contactado"
+        | "cotizacion"
+        | "negociacion"
+        | "ganado"
+        | "perdido"
+      customer_type: "lead" | "cliente"
+      interaction_type: "llamada" | "email" | "whatsapp" | "visita" | "otro"
       user_role: "admin" | "gerente" | "vendedor" | "almacen"
     }
     CompositeTypes: {
@@ -249,6 +367,17 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      customer_source: ["referido", "web", "redes", "showroom", "otro"],
+      customer_stage: [
+        "nuevo",
+        "contactado",
+        "cotizacion",
+        "negociacion",
+        "ganado",
+        "perdido",
+      ],
+      customer_type: ["lead", "cliente"],
+      interaction_type: ["llamada", "email", "whatsapp", "visita", "otro"],
       user_role: ["admin", "gerente", "vendedor", "almacen"],
     },
   },
