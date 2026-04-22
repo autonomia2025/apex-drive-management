@@ -10,6 +10,7 @@ import {
   X,
   Sparkles,
   Lock,
+  Contact,
 } from "lucide-react";
 import { Logo } from "@/components/shared/Logo";
 import { useAuth } from "@/hooks/useAuth";
@@ -25,7 +26,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface NavItem {
-  to: "/dashboard" | "/profile" | "/users" | "/activity-log";
+  to: "/dashboard" | "/profile" | "/users" | "/activity-log" | "/crm";
   label: string;
   icon: typeof LayoutDashboard;
   resource: Resource;
@@ -33,13 +34,13 @@ interface NavItem {
 
 const ITEMS: NavItem[] = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, resource: "dashboard" },
+  { to: "/crm", label: "CRM", icon: Contact, resource: "crm" },
   { to: "/users", label: "Usuarios", icon: Users, resource: "users" },
   { to: "/activity-log", label: "Registro de actividad", icon: ScrollText, resource: "activity_log" },
 ];
 
 const FUTURE = [
   { label: "Inventario", icon: Lock },
-  { label: "CRM", icon: Lock },
   { label: "Ventas", icon: Lock },
   { label: "Reportes", icon: Lock },
   { label: "Asistente IA", icon: Sparkles },
