@@ -62,34 +62,40 @@ import {
 import type { Customer, CustomerSource, CustomerStage, CustomerType, Profile } from "@/types";
 import { cn } from "@/lib/utils";
 
+import { zodValidator, fallback } from "@tanstack/zod-adapter";
+
 type SortKey = "created_at" | "updated_at" | "full_name";
 type SortDir = "asc" | "desc";
 
-interface SearchParams {
+const stageEnum = z.enum(["all", ...STAGES] as [string, ...string[]]);
+const typeEnum = z.enum(["all", ...TYPES] as [string, ...string[]]);
+const sourceEnum = z.enum(["all", ...SOURCES] as [string, ...string[]]);
+
+const searchSchema = z.object({
+  q: fallback(z.string(), "").default(""),
+  stage: fallback(stageEnum, "all").default("all"),
+  type: fallback(typeEnum, "all").default("all"),
+  source: fallback(sourceEnum, "all").default("all"),
+  assignee: fallback(z.string(), "all").default("all"),
+  sort: fallback(z.enum(["created_at", "updated_at", "full_name"]), "created_at").default("created_at"),
+  dir: fallback(z.enum(["asc", "desc"]), "desc").default("desc"),
+  page: fallback(z.coerce.number().int().min(1), 1).default(1),
+});
+
+type SearchParams = {
   q: string;
   stage: CustomerStage | "all";
   type: CustomerType | "all";
   source: CustomerSource | "all";
-  assignee: string; // 'all' | 'unassigned' | profile id
+  assignee: string;
   sort: SortKey;
   dir: SortDir;
   page: number;
-}
-
-const searchSchema = z.object({
-  q: z.string().catch(""),
-  stage: z.enum(["all", ...STAGES]).catch("all"),
-  type: z.enum(["all", ...TYPES]).catch("all"),
-  source: z.enum(["all", ...SOURCES]).catch("all"),
-  assignee: z.string().catch("all"),
-  sort: z.enum(["created_at", "updated_at", "full_name"]).catch("created_at"),
-  dir: z.enum(["asc", "desc"]).catch("desc"),
-  page: z.coerce.number().int().min(1).catch(1),
-});
+};
 
 export const Route = createFileRoute("/_app/crm/")({
   head: () => ({ meta: [{ title: "CRM — AUTO Gestión" }] }),
-  validateSearch: (s): SearchParams => searchSchema.parse(s) as SearchParams,
+  validateSearch: zodValidator(searchSchema),
   component: CrmListPage,
 });
 
