@@ -185,7 +185,11 @@ function CrmListPage() {
 
   const setParam = <K extends keyof SearchParams>(key: K, value: SearchParams[K]) => {
     navigate({
-      search: (prev) => ({ ...prev, [key]: value, page: key === "page" ? (value as number) : 1 }),
+      search: (prev: SearchParams) => ({
+        ...prev,
+        [key]: value,
+        page: key === "page" ? (value as number) : 1,
+      }),
     });
   };
 
@@ -193,7 +197,7 @@ function CrmListPage() {
     if (search.sort === key) {
       setParam("dir", search.dir === "asc" ? "desc" : "asc");
     } else {
-      navigate({ search: (prev) => ({ ...prev, sort: key, dir: "desc", page: 1 }) });
+      navigate({ search: (prev: SearchParams) => ({ ...prev, sort: key, dir: "desc", page: 1 }) });
     }
   };
 
@@ -246,7 +250,7 @@ function CrmListPage() {
     await logActivity("customer_created", { customer_id: data.id, full_name: data.full_name });
     toast.success("Cliente creado");
     setCreateOpen(false);
-    navigate({ search: (prev) => ({ ...prev, page: 1 }) });
+    navigate({ search: (prev: SearchParams) => ({ ...prev, page: 1 }) });
   };
 
   return (
