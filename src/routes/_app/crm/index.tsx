@@ -381,34 +381,36 @@ function CrmListPage() {
               {rows.map((c) => {
                 const assignee = c.assigned_to ? profilesById.get(c.assigned_to) : null;
                 return (
-                  <TableRow key={c.id} className="cursor-pointer border-border" asChild>
-                    <Link to="/crm/$customerId" params={{ customerId: c.id }}>
-                      <TableCell>
-                        <div className="font-medium text-foreground">{c.full_name}</div>
-                        <div className="text-xs text-muted-foreground">{TYPE_LABELS[c.type]}</div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="space-y-0.5 text-xs text-muted-foreground">
-                          {c.email && (
-                            <div className="flex items-center gap-1.5"><Mail className="h-3 w-3" />{c.email}</div>
-                          )}
-                          {c.phone && (
-                            <div className="flex items-center gap-1.5"><Phone className="h-3 w-3" />{c.phone}</div>
-                          )}
-                          {!c.email && !c.phone && <span>—</span>}
-                        </div>
-                      </TableCell>
-                      <TableCell><StageBadge stage={c.stage} /></TableCell>
-                      <TableCell className="hidden text-xs text-muted-foreground lg:table-cell">
-                        {SOURCE_LABELS[c.source]}
-                      </TableCell>
-                      <TableCell className="hidden text-xs text-muted-foreground md:table-cell">
-                        {assignee?.full_name ?? <span className="italic">Sin asignar</span>}
-                      </TableCell>
-                      <TableCell className="hidden text-xs text-muted-foreground md:table-cell">
-                        {new Date(c.updated_at).toLocaleDateString("es", { day: "2-digit", month: "short", year: "numeric" })}
-                      </TableCell>
-                    </Link>
+                  <TableRow
+                    key={c.id}
+                    className="cursor-pointer border-border"
+                    onClick={() => navigate({ to: "/crm/$customerId", params: { customerId: c.id } })}
+                  >
+                    <TableCell>
+                      <div className="font-medium text-foreground">{c.full_name}</div>
+                      <div className="text-xs text-muted-foreground">{TYPE_LABELS[c.type]}</div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="space-y-0.5 text-xs text-muted-foreground">
+                        {c.email && (
+                          <div className="flex items-center gap-1.5"><Mail className="h-3 w-3" />{c.email}</div>
+                        )}
+                        {c.phone && (
+                          <div className="flex items-center gap-1.5"><Phone className="h-3 w-3" />{c.phone}</div>
+                        )}
+                        {!c.email && !c.phone && <span>—</span>}
+                      </div>
+                    </TableCell>
+                    <TableCell><StageBadge stage={c.stage} /></TableCell>
+                    <TableCell className="hidden text-xs text-muted-foreground lg:table-cell">
+                      {SOURCE_LABELS[c.source]}
+                    </TableCell>
+                    <TableCell className="hidden text-xs text-muted-foreground md:table-cell">
+                      {assignee?.full_name ?? <span className="italic">Sin asignar</span>}
+                    </TableCell>
+                    <TableCell className="hidden text-xs text-muted-foreground md:table-cell">
+                      {new Date(c.updated_at).toLocaleDateString("es", { day: "2-digit", month: "short", year: "numeric" })}
+                    </TableCell>
                   </TableRow>
                 );
               })}
