@@ -22,7 +22,13 @@ export interface ActivityLogEntry {
 
 // CRM
 export type CustomerType = "lead" | "cliente";
-export type CustomerStage = "nuevo" | "contactado" | "cotizacion" | "negociacion" | "ganado" | "perdido";
+export type CustomerStage =
+  | "nuevo"
+  | "contactado"
+  | "cotizacion"
+  | "negociacion"
+  | "ganado"
+  | "perdido";
 export type CustomerSource = "referido" | "web" | "redes" | "showroom" | "otro";
 export type InteractionType = "llamada" | "email" | "whatsapp" | "visita" | "otro";
 

@@ -52,18 +52,8 @@ import { StageBadge } from "@/components/crm/StageBadge";
 import { useAuth } from "@/hooks/useAuth";
 import { canAccess } from "@/lib/permissions";
 import { supabase } from "@/integrations/supabase/client";
-import {
-  INTERACTION_LABELS,
-  INTERACTION_TYPES,
-  SOURCE_LABELS,
-  TYPE_LABELS,
-} from "@/lib/crm";
-import type {
-  Customer,
-  CustomerInteraction,
-  InteractionType,
-  Profile,
-} from "@/types";
+import { INTERACTION_LABELS, INTERACTION_TYPES, SOURCE_LABELS, TYPE_LABELS } from "@/lib/crm";
+import type { Customer, CustomerInteraction, InteractionType, Profile } from "@/types";
 import { CustomerFormDialog } from "./index";
 
 export const Route = createFileRoute("/_app/crm/$customerId")({
@@ -72,7 +62,9 @@ export const Route = createFileRoute("/_app/crm/$customerId")({
   notFoundComponent: () => (
     <div className="py-16 text-center text-muted-foreground">
       Cliente no encontrado.{" "}
-      <Link to="/crm" className="text-primary hover:underline">Volver al CRM</Link>
+      <Link to="/crm" className="text-primary hover:underline">
+        Volver al CRM
+      </Link>
     </div>
   ),
 });
@@ -136,9 +128,11 @@ function CustomerDetailPage() {
 
   const onAddInteraction = interactionForm.handleSubmit(async (v) => {
     if (!user) return;
-    const { error } = await supabase.from("customer_interactions").insert([
-      { customer_id: customerId, type: v.type, description: v.description, author_id: user.id },
-    ]);
+    const { error } = await supabase
+      .from("customer_interactions")
+      .insert([
+        { customer_id: customerId, type: v.type, description: v.description, author_id: user.id },
+      ]);
     if (error) {
       toast.error("No se pudo registrar la interacción");
       return;
@@ -149,7 +143,11 @@ function CustomerDetailPage() {
     load();
   });
 
-  const onUpdate = async (values: Parameters<typeof CustomerFormDialog>[0]["onSubmit"] extends (v: infer V) => unknown ? V : never) => {
+  const onUpdate = async (
+    values: Parameters<typeof CustomerFormDialog>[0]["onSubmit"] extends (v: infer V) => unknown
+      ? V
+      : never,
+  ) => {
     const payload = {
       full_name: values.full_name,
       email: values.email || null,
@@ -208,12 +206,16 @@ function CustomerDetailPage() {
     return (
       <div className="py-16 text-center text-muted-foreground">
         Cliente no encontrado.{" "}
-        <Link to="/crm" className="text-primary hover:underline">Volver al CRM</Link>
+        <Link to="/crm" className="text-primary hover:underline">
+          Volver al CRM
+        </Link>
       </div>
     );
   }
 
-  const assignee = customer.assigned_to ? profiles.find((p) => p.id === customer.assigned_to) : null;
+  const assignee = customer.assigned_to
+    ? profiles.find((p) => p.id === customer.assigned_to)
+    : null;
   const profilesById = new Map(profiles.map((p) => [p.id, p]));
 
   return (
@@ -233,35 +235,60 @@ function CustomerDetailPage() {
       <div className="flex flex-wrap items-start justify-between gap-4 rounded-xl border border-border bg-surface p-6">
         <div className="space-y-2">
           <div className="flex items-center gap-3">
-            <h2 className="text-2xl font-semibold tracking-tight text-foreground">{customer.full_name}</h2>
+            <h2 className="text-2xl font-semibold tracking-tight text-foreground">
+              {customer.full_name}
+            </h2>
             <span className="rounded-md border border-border bg-surface-elevated px-2 py-0.5 text-xs text-muted-foreground">
               {TYPE_LABELS[customer.type]}
             </span>
           </div>
           <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
             {customer.email && (
-              <span className="flex items-center gap-1.5"><Mail className="h-3.5 w-3.5" />{customer.email}</span>
+              <span className="flex items-center gap-1.5">
+                <Mail className="h-3.5 w-3.5" />
+                {customer.email}
+              </span>
             )}
             {customer.phone && (
-              <span className="flex items-center gap-1.5"><Phone className="h-3.5 w-3.5" />{customer.phone}</span>
+              <span className="flex items-center gap-1.5">
+                <Phone className="h-3.5 w-3.5" />
+                {customer.phone}
+              </span>
             )}
           </div>
           <div className="flex flex-wrap items-center gap-3 pt-1 text-xs text-muted-foreground">
-            <span>Origen: <span className="text-foreground">{SOURCE_LABELS[customer.source]}</span></span>
+            <span>
+              Origen: <span className="text-foreground">{SOURCE_LABELS[customer.source]}</span>
+            </span>
             <span className="text-border">·</span>
-            <span>Vendedor: <span className="text-foreground">{assignee?.full_name ?? "Sin asignar"}</span></span>
+            <span>
+              Vendedor:{" "}
+              <span className="text-foreground">{assignee?.full_name ?? "Sin asignar"}</span>
+            </span>
             <span className="text-border">·</span>
-            <span>Creado: {new Date(customer.created_at).toLocaleDateString("es", { day: "2-digit", month: "short", year: "numeric" })}</span>
+            <span>
+              Creado:{" "}
+              {new Date(customer.created_at).toLocaleDateString("es", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+              })}
+            </span>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
-          <Select value={customer.stage} onValueChange={(v) => onChangeStage(v as Customer["stage"])}>
+          <Select
+            value={customer.stage}
+            onValueChange={(v) => onChangeStage(v as Customer["stage"])}
+          >
             <SelectTrigger className="w-[160px] border-border">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {(["nuevo", "contactado", "cotizacion", "negociacion", "ganado", "perdido"] as const).map((s) => (
+              {(
+                ["nuevo", "contactado", "cotizacion", "negociacion", "ganado", "perdido"] as const
+              ).map((s) => (
                 <SelectItem key={s} value={s}>
                   <StageBadge stage={s} />
                 </SelectItem>
@@ -289,7 +316,12 @@ function CustomerDetailPage() {
             />
           </Dialog>
           {canManage && (
-            <Button variant="outline" size="sm" onClick={() => setConfirmDelete(true)} className="text-destructive hover:text-destructive">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setConfirmDelete(true)}
+              className="text-destructive hover:text-destructive"
+            >
               <Trash2 className="h-3.5 w-3.5" />
             </Button>
           )}
@@ -314,16 +346,23 @@ function CustomerDetailPage() {
           </div>
 
           {/* Add interaction */}
-          <form onSubmit={onAddInteraction} className="space-y-3 rounded-lg border border-border bg-background p-3">
+          <form
+            onSubmit={onAddInteraction}
+            className="space-y-3 rounded-lg border border-border bg-background p-3"
+          >
             <div className="flex items-center gap-2">
               <Select
                 defaultValue="llamada"
                 onValueChange={(v) => interactionForm.setValue("type", v as InteractionType)}
               >
-                <SelectTrigger className="w-[140px]"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="w-[140px]">
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   {INTERACTION_TYPES.map((t) => (
-                    <SelectItem key={t} value={t}>{INTERACTION_LABELS[t]}</SelectItem>
+                    <SelectItem key={t} value={t}>
+                      {INTERACTION_LABELS[t]}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -335,7 +374,9 @@ function CustomerDetailPage() {
               {...interactionForm.register("description")}
             />
             {interactionForm.formState.errors.description && (
-              <p className="text-xs text-destructive">{interactionForm.formState.errors.description.message}</p>
+              <p className="text-xs text-destructive">
+                {interactionForm.formState.errors.description.message}
+              </p>
             )}
             <div className="flex justify-end">
               <Button
@@ -347,7 +388,9 @@ function CustomerDetailPage() {
                 {interactionForm.formState.isSubmitting ? (
                   <Loader2 className="h-3.5 w-3.5 animate-spin" />
                 ) : (
-                  <><Plus className="mr-1 h-3.5 w-3.5" /> Registrar</>
+                  <>
+                    <Plus className="mr-1 h-3.5 w-3.5" /> Registrar
+                  </>
                 )}
               </Button>
             </div>
@@ -376,11 +419,19 @@ function CustomerDetailPage() {
                         <div>
                           <div className="text-xs font-medium text-foreground">
                             {INTERACTION_LABELS[it.type]}
-                            {author && <span className="ml-2 font-normal text-muted-foreground">por {author.full_name}</span>}
+                            {author && (
+                              <span className="ml-2 font-normal text-muted-foreground">
+                                por {author.full_name}
+                              </span>
+                            )}
                           </div>
                           <div className="text-[11px] text-muted-foreground">
                             {new Date(it.created_at).toLocaleString("es", {
-                              day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit",
+                              day: "2-digit",
+                              month: "short",
+                              year: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
                             })}
                           </div>
                         </div>
@@ -394,7 +445,9 @@ function CustomerDetailPage() {
                           </button>
                         )}
                       </div>
-                      <p className="mt-2 whitespace-pre-wrap text-sm text-foreground">{it.description}</p>
+                      <p className="mt-2 whitespace-pre-wrap text-sm text-foreground">
+                        {it.description}
+                      </p>
                     </div>
                   </li>
                 );
@@ -409,12 +462,16 @@ function CustomerDetailPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>¿Eliminar este cliente?</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta acción no se puede deshacer. También se eliminarán todas las interacciones registradas.
+              Esta acción no se puede deshacer. También se eliminarán todas las interacciones
+              registradas.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={onDelete} className="bg-destructive hover:bg-destructive/90">
+            <AlertDialogAction
+              onClick={onDelete}
+              className="bg-destructive hover:bg-destructive/90"
+            >
               Eliminar
             </AlertDialogAction>
           </AlertDialogFooter>

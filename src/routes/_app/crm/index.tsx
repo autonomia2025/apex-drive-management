@@ -77,7 +77,9 @@ const searchSchema = z.object({
   type: fallback(typeEnum, "all").default("all"),
   source: fallback(sourceEnum, "all").default("all"),
   assignee: fallback(z.string(), "all").default("all"),
-  sort: fallback(z.enum(["created_at", "updated_at", "full_name"]), "created_at").default("created_at"),
+  sort: fallback(z.enum(["created_at", "updated_at", "full_name"]), "created_at").default(
+    "created_at",
+  ),
   dir: fallback(z.enum(["asc", "desc"]), "desc").default("desc"),
   page: fallback(z.coerce.number().int().min(1), 1).default(1),
 });
@@ -101,7 +103,13 @@ export const Route = createFileRoute("/_app/crm/")({
 
 const customerSchema = z.object({
   full_name: z.string().trim().min(2, { message: "Mínimo 2 caracteres" }).max(120),
-  email: z.string().trim().email({ message: "Correo inválido" }).max(255).optional().or(z.literal("")),
+  email: z
+    .string()
+    .trim()
+    .email({ message: "Correo inválido" })
+    .max(255)
+    .optional()
+    .or(z.literal("")),
   phone: z.string().trim().max(40).optional().or(z.literal("")),
   type: z.enum(["lead", "cliente"]),
   stage: z.enum(["nuevo", "contactado", "cotizacion", "negociacion", "ganado", "perdido"]),
@@ -125,10 +133,7 @@ function CrmListPage() {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [createOpen, setCreateOpen] = useState(false);
 
-  const profilesById = useMemo(
-    () => new Map(profiles.map((p) => [p.id, p])),
-    [profiles],
-  );
+  const profilesById = useMemo(() => new Map(profiles.map((p) => [p.id, p])), [profiles]);
 
   // Load assignable profiles (active sales staff)
   useEffect(() => {
@@ -146,15 +151,11 @@ function CrmListPage() {
     setRows(null);
 
     const run = async () => {
-      let query = supabase
-        .from("customers")
-        .select("*", { count: "exact" });
+      let query = supabase.from("customers").select("*", { count: "exact" });
 
       if (search.q.trim()) {
         const term = `%${search.q.trim()}%`;
-        query = query.or(
-          `full_name.ilike.${term},email.ilike.${term},phone.ilike.${term}`,
-        );
+        query = query.or(`full_name.ilike.${term},email.ilike.${term},phone.ilike.${term}`);
       }
       if (search.stage !== "all") query = query.eq("stage", search.stage);
       if (search.type !== "all") query = query.eq("type", search.type);
@@ -181,7 +182,16 @@ function CrmListPage() {
     return () => {
       cancelled = true;
     };
-  }, [search.q, search.stage, search.type, search.source, search.assignee, search.sort, search.dir, search.page]);
+  }, [
+    search.q,
+    search.stage,
+    search.type,
+    search.source,
+    search.assignee,
+    search.sort,
+    search.dir,
+    search.page,
+  ]);
 
   const setParam = <K extends keyof SearchParams>(key: K, value: SearchParams[K]) => {
     navigate({
@@ -238,11 +248,7 @@ function CrmListPage() {
       notes: values.notes || null,
       created_by: user.id,
     };
-    const { data, error } = await supabase
-      .from("customers")
-      .insert([payload])
-      .select()
-      .single();
+    const { data, error } = await supabase.from("customers").insert([payload]).select().single();
     if (error) {
       toast.error("No se pudo crear el cliente");
       return;
@@ -259,7 +265,8 @@ function CrmListPage() {
         <div>
           <h2 className="text-lg font-semibold text-foreground">CRM</h2>
           <p className="text-sm text-muted-foreground">
-            Gestiona prospectos y clientes. {total > 0 && `${total} ${total === 1 ? "registro" : "registros"}`}
+            Gestiona prospectos y clientes.{" "}
+            {total > 0 && `${total} ${total === 1 ? "registro" : "registros"}`}
           </p>
         </div>
         <Dialog open={createOpen} onOpenChange={setCreateOpen}>
@@ -291,38 +298,53 @@ function CrmListPage() {
             />
           </div>
 
-          <Select value={search.stage} onValueChange={(v) => setParam("stage", v as SearchParams["stage"])}>
+          <Select
+            value={search.stage}
+            onValueChange={(v) => setParam("stage", v as SearchParams["stage"])}
+          >
             <SelectTrigger className="w-[150px]">
               <SelectValue placeholder="Etapa" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todas las etapas</SelectItem>
               {STAGES.map((s) => (
-                <SelectItem key={s} value={s}>{STAGE_LABELS[s]}</SelectItem>
+                <SelectItem key={s} value={s}>
+                  {STAGE_LABELS[s]}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
 
-          <Select value={search.type} onValueChange={(v) => setParam("type", v as SearchParams["type"])}>
+          <Select
+            value={search.type}
+            onValueChange={(v) => setParam("type", v as SearchParams["type"])}
+          >
             <SelectTrigger className="w-[130px]">
               <SelectValue placeholder="Tipo" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Lead y cliente</SelectItem>
               {TYPES.map((t) => (
-                <SelectItem key={t} value={t}>{TYPE_LABELS[t]}</SelectItem>
+                <SelectItem key={t} value={t}>
+                  {TYPE_LABELS[t]}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
 
-          <Select value={search.source} onValueChange={(v) => setParam("source", v as SearchParams["source"])}>
+          <Select
+            value={search.source}
+            onValueChange={(v) => setParam("source", v as SearchParams["source"])}
+          >
             <SelectTrigger className="w-[150px]">
               <SelectValue placeholder="Origen" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todos los orígenes</SelectItem>
               {SOURCES.map((s) => (
-                <SelectItem key={s} value={s}>{SOURCE_LABELS[s]}</SelectItem>
+                <SelectItem key={s} value={s}>
+                  {SOURCE_LABELS[s]}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -335,13 +357,20 @@ function CrmListPage() {
               <SelectItem value="all">Todos los vendedores</SelectItem>
               <SelectItem value="unassigned">Sin asignar</SelectItem>
               {profiles.map((p) => (
-                <SelectItem key={p.id} value={p.id}>{p.full_name}</SelectItem>
+                <SelectItem key={p.id} value={p.id}>
+                  {p.full_name}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
 
           {hasFilters && (
-            <Button variant="ghost" size="sm" onClick={clearFilters} className="text-muted-foreground">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={clearFilters}
+              className="text-muted-foreground"
+            >
               <X className="mr-1 h-3.5 w-3.5" />
               Limpiar
             </Button>
@@ -356,7 +385,11 @@ function CrmListPage() {
         ) : rows.length === 0 ? (
           <EmptyState
             title={hasFilters ? "Sin resultados" : "Aún no hay clientes"}
-            description={hasFilters ? "Prueba ajustando o limpiando los filtros." : "Crea el primer cliente para empezar."}
+            description={
+              hasFilters
+                ? "Prueba ajustando o limpiando los filtros."
+                : "Crea el primer cliente para empezar."
+            }
             icon={hasFilters ? Filter : UserCircle2}
           />
         ) : (
@@ -369,7 +402,9 @@ function CrmListPage() {
                     onClick={() => toggleSort("full_name")}
                   >
                     Cliente
-                    <ArrowUpDown className={cn("h-3 w-3", search.sort === "full_name" && "text-primary")} />
+                    <ArrowUpDown
+                      className={cn("h-3 w-3", search.sort === "full_name" && "text-primary")}
+                    />
                   </button>
                 </TableHead>
                 <TableHead>Contacto</TableHead>
@@ -382,7 +417,9 @@ function CrmListPage() {
                     onClick={() => toggleSort("updated_at")}
                   >
                     Actualizado
-                    <ArrowUpDown className={cn("h-3 w-3", search.sort === "updated_at" && "text-primary")} />
+                    <ArrowUpDown
+                      className={cn("h-3 w-3", search.sort === "updated_at" && "text-primary")}
+                    />
                   </button>
                 </TableHead>
               </TableRow>
@@ -394,7 +431,9 @@ function CrmListPage() {
                   <TableRow
                     key={c.id}
                     className="cursor-pointer border-border"
-                    onClick={() => navigate({ to: "/crm/$customerId", params: { customerId: c.id } })}
+                    onClick={() =>
+                      navigate({ to: "/crm/$customerId", params: { customerId: c.id } })
+                    }
                   >
                     <TableCell>
                       <div className="font-medium text-foreground">{c.full_name}</div>
@@ -403,15 +442,23 @@ function CrmListPage() {
                     <TableCell>
                       <div className="space-y-0.5 text-xs text-muted-foreground">
                         {c.email && (
-                          <div className="flex items-center gap-1.5"><Mail className="h-3 w-3" />{c.email}</div>
+                          <div className="flex items-center gap-1.5">
+                            <Mail className="h-3 w-3" />
+                            {c.email}
+                          </div>
                         )}
                         {c.phone && (
-                          <div className="flex items-center gap-1.5"><Phone className="h-3 w-3" />{c.phone}</div>
+                          <div className="flex items-center gap-1.5">
+                            <Phone className="h-3 w-3" />
+                            {c.phone}
+                          </div>
                         )}
                         {!c.email && !c.phone && <span>—</span>}
                       </div>
                     </TableCell>
-                    <TableCell><StageBadge stage={c.stage} /></TableCell>
+                    <TableCell>
+                      <StageBadge stage={c.stage} />
+                    </TableCell>
                     <TableCell className="hidden text-xs text-muted-foreground lg:table-cell">
                       {SOURCE_LABELS[c.source]}
                     </TableCell>
@@ -419,7 +466,11 @@ function CrmListPage() {
                       {assignee?.full_name ?? <span className="italic">Sin asignar</span>}
                     </TableCell>
                     <TableCell className="hidden text-xs text-muted-foreground md:table-cell">
-                      {new Date(c.updated_at).toLocaleDateString("es", { day: "2-digit", month: "short", year: "numeric" })}
+                      {new Date(c.updated_at).toLocaleDateString("es", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      })}
                     </TableCell>
                   </TableRow>
                 );
@@ -539,10 +590,14 @@ export function CustomerFormDialog({
               defaultValue={form.getValues("type")}
               onValueChange={(v) => form.setValue("type", v as CustomerType)}
             >
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 {TYPES.map((t) => (
-                  <SelectItem key={t} value={t}>{TYPE_LABELS[t]}</SelectItem>
+                  <SelectItem key={t} value={t}>
+                    {TYPE_LABELS[t]}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -553,10 +608,14 @@ export function CustomerFormDialog({
               defaultValue={form.getValues("stage")}
               onValueChange={(v) => form.setValue("stage", v as CustomerStage)}
             >
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 {STAGES.map((s) => (
-                  <SelectItem key={s} value={s}>{STAGE_LABELS[s]}</SelectItem>
+                  <SelectItem key={s} value={s}>
+                    {STAGE_LABELS[s]}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -567,10 +626,14 @@ export function CustomerFormDialog({
               defaultValue={form.getValues("source")}
               onValueChange={(v) => form.setValue("source", v as CustomerSource)}
             >
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 {SOURCES.map((s) => (
-                  <SelectItem key={s} value={s}>{SOURCE_LABELS[s]}</SelectItem>
+                  <SelectItem key={s} value={s}>
+                    {SOURCE_LABELS[s]}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -583,11 +646,15 @@ export function CustomerFormDialog({
             defaultValue={form.getValues("assigned_to") ?? "none"}
             onValueChange={(v) => form.setValue("assigned_to", v)}
           >
-            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="none">Sin asignar</SelectItem>
               {profiles.map((p) => (
-                <SelectItem key={p.id} value={p.id}>{p.full_name}</SelectItem>
+                <SelectItem key={p.id} value={p.id}>
+                  {p.full_name}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -595,11 +662,20 @@ export function CustomerFormDialog({
 
         <div className="space-y-2">
           <Label>Notas</Label>
-          <Textarea rows={3} {...form.register("notes")} placeholder="Información relevante del cliente…" />
+          <Textarea
+            rows={3}
+            {...form.register("notes")}
+            placeholder="Información relevante del cliente…"
+          />
         </div>
       </form>
       <DialogFooter>
-        <Button form="customer-form" type="submit" disabled={submitting} className="bg-primary hover:bg-primary-hover">
+        <Button
+          form="customer-form"
+          type="submit"
+          disabled={submitting}
+          className="bg-primary hover:bg-primary-hover"
+        >
           {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Guardar"}
         </Button>
       </DialogFooter>

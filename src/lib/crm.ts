@@ -1,9 +1,4 @@
-import type {
-  CustomerSource,
-  CustomerStage,
-  CustomerType,
-  InteractionType,
-} from "@/types";
+import type { CustomerSource, CustomerStage, CustomerType, InteractionType } from "@/types";
 
 export const STAGE_LABELS: Record<CustomerStage, string> = {
   nuevo: "Nuevo",
@@ -57,6 +52,12 @@ export const INTERACTION_LABELS: Record<InteractionType, string> = {
 export const STAGES: CustomerStage[] = STAGE_ORDER;
 export const TYPES: CustomerType[] = ["lead", "cliente"];
 export const SOURCES: CustomerSource[] = ["referido", "web", "redes", "showroom", "otro"];
-export const INTERACTION_TYPES: InteractionType[] = ["llamada", "email", "whatsapp", "visita", "otro"];
+export const INTERACTION_TYPES: InteractionType[] = [
+  "llamada",
+  "email",
+  "whatsapp",
+  "visita",
+  "otro",
+];
 
 export const PAGE_SIZE = 20;
